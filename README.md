@@ -61,17 +61,7 @@ This is not a generic "paste an error into a chatbot" tool. It is a **structured
 - Dark, responsive developer-tool UI with loading, error and empty states
 - No login, no database, no API key in the browser
 
-## Screenshots
 
-| Home | Debugger form | Diagnosis |
-|---|---|---|
-| ![Home](docs/screenshots/01-home.png) | ![Form](docs/screenshots/02-form.png) | ![Diagnosis](docs/screenshots/03-diagnosis.png) |
-
-| Before / After | Saved cases | Mobile |
-|---|---|---|
-| ![Compare](docs/screenshots/04-before-after.png) | ![Saved](docs/screenshots/05-saved-cases.png) | ![Mobile](docs/screenshots/06-mobile.png) |
-
-*(Add your screenshots to `docs/screenshots/` using these file names.)*
 
 ## How it works
 
@@ -147,69 +137,12 @@ agent-autopsy/
     └── screenshots/
 ```
 
-## Local setup
 
-You need [Node.js 20+](https://nodejs.org) and a free [Vercel](https://vercel.com) account.
 
-```bash
-# 1. Get the code
-git clone https://github.com/YOUR_GITHUB_USERNAME/agent-autopsy.git
-cd agent-autopsy
-
-# 2. Add your key for local testing (this file is git-ignored)
-cp .env.example .env
-# open .env and paste your real BHARATCODE_API_KEY
-
-# 3. Run the site + API together
-npx vercel dev
-```
-
-Open the URL it prints (usually http://localhost:3000). On localhost the frontend automatically calls `/api/debug` on the same server.
-
-## Deploy the backend to Vercel
-
-1. Go to [vercel.com](https://vercel.com) and sign up with GitHub.
-2. Click **Add New... > Project** and import your `agent-autopsy` repository.
-3. Leave **Framework Preset** as **Other**. Leave build settings empty.
-4. Open **Environment Variables** and add:
-   - `BHARATCODE_API_KEY` = your real key
-   - `BHARATCODE_MODEL` = `qwen-3.8-27b`
-   - `ALLOWED_ORIGINS` = `https://YOUR_GITHUB_USERNAME.github.io`
-5. Click **Deploy**. Your backend URL looks like `https://agent-autopsy-xxxx.vercel.app`.
-6. Open `app.js`, set `BACKEND_URL` to that URL, commit and push.
-
-Vercel also serves the full site at that same URL, so you get a working fallback demo for free.
-
-## Deploy the frontend to GitHub Pages
-
-1. In your repository open **Settings > Pages**.
-2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
-3. Choose branch **main** and folder **/ (root)**, then click **Save**.
-4. After about a minute your site is live at `https://YOUR_GITHUB_USERNAME.github.io/agent-autopsy/`.
-
-To update the live site later, commit and push your changes to `main`. GitHub Pages redeploys automatically.
-
-## Example use cases
-
-| Case | Failure type | File |
-|---|---|---|
-| Stray whitespace in a tool argument makes a lookup return 404 | `tool_call` | [examples/whitespace-tool-call.md](examples/whitespace-tool-call.md) |
-| Single quotes, trailing commas and a markdown fence break parsing | `json_format` | [examples/invalid-json-tool-call.md](examples/invalid-json-tool-call.md) |
-| A finance question is sent to web search instead of the database | `prompt` | [examples/wrong-tool-selection.md](examples/wrong-tool-selection.md) |
-
-## Roadmap
-
-- [ ] Paste a full multi-step trace and auto-detect the failing step
-- [ ] Support common agent framework trace formats
-- [ ] Generate a regression test for every fixed case
-- [ ] Shareable diagnosis links and team case libraries
-- [ ] CLI and VS Code extension
-- [ ] Failure pattern analytics across saved cases
-- [ ] Explanations in Hindi and other Indian languages
 
 ## License
 
-[MIT](LICENSE) © 2026 [YOUR_NAME]
+[MIT](LICENSE) © 2026 [arokia nisha]
 
 ---
 
