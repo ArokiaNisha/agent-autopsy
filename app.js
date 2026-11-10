@@ -8,7 +8,7 @@
   // After you deploy the backend to Vercel, paste its URL here (no trailing slash).
   // Example: "https://agent-autopsy-api.vercel.app"
   // When the site itself is served from Vercel or localhost, "/api/debug" is used automatically.
-  const BACKEND_URL = "https://YOUR-VERCEL-PROJECT.vercel.app";
+  const BACKEND_URL = "https://agent-autopsy-agbw3tt5o-arokianishaaldy-9310s-projects.vercel.app/";
 
   const API_ENDPOINT = (() => {
     const h = location.hostname;
