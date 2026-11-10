@@ -252,7 +252,7 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         model: process.env.BHARATCODE_MODEL || DEFAULT_MODEL,
         temperature: 0.2,
-        max_tokens: 2500,
+        max_tokens: 8000,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: buildUserMessage(data) },
