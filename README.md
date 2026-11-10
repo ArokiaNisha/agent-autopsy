@@ -6,8 +6,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-3b82f6?style=for-the-badge)](LICENSE)
 [![Built for BharatCode Build League](https://img.shields.io/badge/Built%20for-BharatCode%20Build%20League-0e1628?style=for-the-badge)](https://bharatcode.ai)
 
-**Live demo:** https://YOUR_GITHUB_USERNAME.github.io/agent-autopsy/  *(replace after deploying)*
-**Backend API:** https://YOUR-VERCEL-PROJECT.vercel.app/api/debug  *(replace after deploying)*
+**Live demo:**https://github.com/ArokiaNisha/agent-autopsy.git  **
+**Backend API:** https://agent-autopsy-agbw3tt5o-arokianishaaldy-9310s-projects.vercel.app/*
 
 Paste a failed agent run. Get the root cause, the exact step that broke, a rewritten prompt and a corrected tool call, ready to copy and re-run.
 
