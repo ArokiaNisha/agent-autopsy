@@ -1,0 +1,10 @@
+{
+  "name": "agent-autopsy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Find why your AI agent failed. Fix the prompt, tool call, or workflow. Powered by BharatCode.",
+  "license": "MIT",
+  "engines": {
+    "node": "20.x"
+  }
+}

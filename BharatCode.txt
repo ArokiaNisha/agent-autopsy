@@ -1,0 +1,73 @@
+PROJECT NAME
+Agent Autopsy
+
+ONE-LINE DESCRIPTION
+Find why your AI agent failed. Fix the prompt, tool call, or workflow.
+
+PROBLEM STATEMENT
+AI agents fail in confusing ways: an ambiguous prompt, the wrong tool, a bad argument
+(for example a stray space in an ID), invalid JSON in a tool call, or missing context.
+Developers then spend a long time manually reading prompts, model replies, tool outputs
+and stack traces to work out what actually went wrong. This is slow, repetitive and
+especially painful for beginners building agentic workloads.
+
+SOLUTION
+Agent Autopsy is a lightweight web app. A developer pastes a failed agent run into a
+guided form (objective, system prompt, model response, tool call, tool output, error,
+expected output). A BharatCode model analyzes the run and returns a consistent,
+structured diagnosis:
+  - Issue title
+  - Failure type (prompt | tool_call | json_format | missing_context | model_output | workflow)
+  - Root cause
+  - Problematic step (the exact field or step that failed first)
+  - Confidence (high | medium | low)
+  - A complete improved prompt
+  - A corrected tool call as valid JSON (or null)
+  - Ordered next steps, including how to verify the fix
+
+KEY FEATURES
+  - Guided debugging form that collects exactly the context a debugger needs
+  - Three realistic one-click examples (whitespace in an argument, invalid JSON, wrong tool)
+  - Structured result panel with failure type and confidence badges
+  - Before / After comparison: prompt, tool call, and error vs expected outcome
+  - Copy buttons for the improved prompt, the corrected tool call and the full diagnosis
+  - Save cases locally (localStorage) with Open / Fixed status and reopen support
+  - Download the diagnosis as a Markdown file to attach to an issue or PR
+  - Dark, responsive developer-tool UI with loading, error and empty states
+  - No login, no database, no API key in the browser
+
+BHARATCODE API USAGE
+  - Uses the BharatCode model API through the OpenAI-compatible Chat Completions format:
+    POST https://bharatcode.ai/api/model/v1/chat/completions
+    Authorization: Bearer <BHARATCODE_API_KEY>
+  - Default model: qwen-3.8-27b (configurable with the BHARATCODE_MODEL environment variable)
+  - A dedicated system prompt makes the model act as a senior agent-debugging engineer and
+    return ONLY a strict JSON object. The backend extracts, validates and normalizes that
+    JSON so the UI always receives a predictable shape.
+  - The API key exists only as a backend environment variable (Vercel serverless function).
+    The browser never sees it and it is never committed to the repository.
+
+INNOVATION
+This is not a generic "paste an error into a chatbot" tool. It is a structured,
+BharatCode-native debugging workflow:
+  1. A guided form that captures the right evidence in the right fields.
+  2. A prompt that forces "earliest failure first" reasoning, so a downstream tool error is
+     traced back to the bad tool call or prompt that caused it.
+  3. A fixed JSON schema, validated server-side, so output is consistent and copy-paste ready.
+  4. Actionable artifacts (a rewritten prompt and a runnable corrected tool call) instead
+     of advice, plus Before / After diffs, saved cases and Markdown export.
+
+FUTURE ROADMAP
+  - Paste a full multi-step agent trace and let the tool find the failing step automatically
+  - Support for common trace formats and agent frameworks
+  - Suggested regression tests for each fixed case
+  - Shareable diagnosis links and team case libraries
+  - CLI and VS Code extension for debugging without leaving the terminal or editor
+  - Failure pattern analytics across saved cases
+  - Hindi and other Indian-language explanations of the diagnosis
+
+BUILT FOR
+BharatCode Build League
+
+POWERED BY
+BharatCode
