@@ -5,6 +5,6 @@
   "description": "Find why your AI agent failed. Fix the prompt, tool call, or workflow. Powered by BharatCode.",
   "license": "MIT",
   "engines": {
-    "node": "20.x"
+    "node": "26.x"
   }
 }
