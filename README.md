@@ -4,10 +4,13 @@
 
 [![Powered by BharatCode](https://img.shields.io/badge/Powered%20by-BharatCode-22d3ee?style=for-the-badge)](https://bharatcode.ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3b82f6?style=for-the-badge)](LICENSE)
-[![Built for BharatCode Build League](https://img.shields.io/badge/Built%20for-BharatCode%20Build%20League-0e1628?style=for-the-badge)](https://bharatcode.ai)
+[![Built for BharatCode Build League](https://img.shields.io/badge/Built%20for%20BharatCode%20Build%20League-0e1628?style=for-the-badge)](https://bharatcode.ai)
 
-**Live demo:**https://github.com/ArokiaNisha/agent-autopsy.git  **
-**Backend API:** https://agent-autopsy-agbw3tt5o-arokianishaaldy-9310s-projects.vercel.app/*
+**Live demo:** https://agent-autopsy-gamma.vercel.app
+
+**GitHub repository:** https://github.com/ArokiaNisha/agent-autopsy
+
+**Backend API endpoint:** https://agent-autopsy-agbw3tt5o-arokianishaaldy-9310s-projects.vercel.app/api/debug
 
 Paste a failed agent run. Get the root cause, the exact step that broke, a rewritten prompt and a corrected tool call, ready to copy and re-run.
 
@@ -17,17 +20,19 @@ Paste a failed agent run. Get the root cause, the exact step that broke, a rewri
 
 AI agents rarely fail loudly. They fail because of:
 
-- an ambiguous or incomplete system prompt
-- the wrong tool being picked for the job
-- a bad argument (for example `" ORD-10482 "` with stray spaces)
-- invalid JSON in a tool call (trailing commas, single quotes, markdown fences)
-- missing context or a badly formatted output
+- An ambiguous or incomplete system prompt
+- The wrong tool being picked for the job
+- A bad argument, for example `" ORD-10482 "` with stray spaces
+- Invalid JSON in a tool call, such as trailing commas, single quotes or markdown fences
+- Missing context or badly formatted output
 
-Developers then burn time reading prompts, model replies, tool outputs and stack traces by hand to work out what went wrong first.
+Developers then spend time reading prompts, model replies, tool outputs and error messages to understand what went wrong first.
 
 ## The solution
 
-**Agent Autopsy** is a lightweight web app that turns a failed run into a structured diagnosis. You fill a guided form, a BharatCode model analyzes it, and you get:
+**Agent Autopsy** is a lightweight web app that turns a failed agent run into a structured diagnosis.
+
+You fill a guided form, a BharatCode model analyzes it, and you get:
 
 | Field | What you get |
 |---|---|
@@ -37,97 +42,207 @@ Developers then burn time reading prompts, model replies, tool outputs and stack
 | Problematic step | The exact field or step that failed first |
 | Confidence | `high`, `medium` or `low` |
 | Improved prompt | A complete rewritten prompt |
-| Corrected tool call | Valid JSON you can paste and run (or `null`) |
+| Corrected tool call | Valid JSON you can copy and re-run, or `null` |
 | Next steps | Ordered actions, including how to verify the fix |
 
-### What makes it different
+## What makes it different
 
-This is not a generic "paste an error into a chatbot" tool. It is a **structured debugging workflow**:
+This is not a generic “paste an error into a chatbot” tool.
+
+It is a structured debugging workflow:
 
 1. A guided form captures the right evidence in the right fields.
-2. The prompt forces *earliest-failure-first* reasoning, so a downstream tool error is traced back to the bad call or prompt that caused it.
-3. The backend validates and normalizes a fixed JSON schema, so the UI is always consistent.
-4. You get runnable artifacts (prompt and tool call), not just advice.
+2. The prompt encourages earliest-failure-first reasoning, so a downstream tool error can be traced back to the bad call or prompt that caused it.
+3. The backend validates and normalizes a fixed JSON schema, so the UI stays consistent.
+4. You get runnable artifacts, such as an improved prompt and corrected tool call, not just advice.
 
 ## Key features
 
-- Guided form: objective, system prompt, model response, tool call, tool output, error, expected output, notes
-- Three one-click realistic examples (whitespace in an argument, invalid JSON, wrong tool)
-- Structured result panel with failure type and confidence badges
-- **Before / After** comparison for prompt, tool call and error vs expected outcome
-- Copy buttons for the improved prompt, the corrected tool call and the full diagnosis
-- Save cases in the browser (`localStorage`) with **Open / Fixed** status and reopen support
-- Download any diagnosis as a Markdown file
-- Dark, responsive developer-tool UI with loading, error and empty states
-- No login, no database, no API key in the browser
-
-
+- Guided debugging form
+- One-click realistic examples
+- Structured result panel
+- Failure type and confidence badges
+- Before / After comparison
+- Copy buttons for improved prompt and corrected tool call
+- Save cases in browser localStorage
+- Download diagnosis as Markdown
+- Dark, responsive developer-tool UI
+- No login and no database
+- BharatCode API key never exposed in the browser
 
 ## How it works
 
-```
-Browser (static site on GitHub Pages)
-        |  POST /api/debug  (JSON)
+```text
+Browser frontend
+        |
+        |  POST /api/debug
         v
-Serverless function (Vercel)  <-- BHARATCODE_API_KEY lives here only
-        |  POST /v1/chat/completions
+Vercel serverless function
+        |
+        |  Authorization: Bearer <BHARATCODE_API_KEY>
         v
 BharatCode model API
-        |  strict JSON diagnosis
+        |
+        |  Structured JSON diagnosis
         v
-Validated + normalized JSON  -->  Result panel in the browser
-```
-
-```mermaid
-flowchart LR
-  A[Static frontend<br/>GitHub Pages] -->|POST /api/debug| B[Serverless API<br/>Vercel]
-  B -->|Chat Completions<br/>Bearer key from env| C[BharatCode API]
-  C -->|JSON diagnosis| B
-  B -->|validated JSON| A
+Validated result in browser
 ```
 
 1. The frontend sends the form fields to `/api/debug`.
-2. The backend validates size and required fields, applies a small per-IP rate limit and builds a debugging prompt.
-3. It calls the BharatCode API, extracts the JSON from the reply, validates the schema and normalizes the fields.
-4. The frontend renders the report, the before/after view and the copy, save and download actions.
+2. The backend validates the request and builds a debugging prompt.
+3. It calls the BharatCode Chat Completions API.
+4. The model returns a structured JSON diagnosis.
+5. The backend validates and normalizes the response.
+6. The frontend displays the diagnosis, improved prompt, corrected tool call and next steps.
 
 ## BharatCode API usage
 
-- Format: OpenAI-compatible **Chat Completions**
-- Endpoint: `https://bharatcode.ai/api/model/v1/chat/completions`
-- Header: `Authorization: Bearer <BHARATCODE_API_KEY>`
-- Default model: `qwen-3.8-27b` (change it with `BHARATCODE_MODEL`)
-- Low temperature (`0.2`) for consistent, structured output
-- A dedicated system prompt (see [`api/debug.js`](api/debug.js)) makes the model act as a senior agent-debugging engineer and return **only** a JSON object
+Agent Autopsy uses the BharatCode model API through an OpenAI-compatible Chat Completions request.
 
-> Please verify the endpoint and model name against the official BharatCode documentation. Both can be changed with environment variables (`BHARATCODE_API_URL`, `BHARATCODE_MODEL`) without touching the code.
+- Endpoint: `https://bharatcode.ai/api/model/v1/chat/completions`
+- Authorization: `Bearer <BHARATCODE_API_KEY>`
+- Default model: `qwen-3.8-27b`
+- Temperature: `0.2`
+
+The API key is stored only as an environment variable in the Vercel backend. It is never exposed to the browser or committed to GitHub.
 
 ## Privacy and API key safety
 
-- The API key is stored **only** as an environment variable on the backend.
-- It is never in the browser, never in the repository and never in client-side code.
-- `.env` files are git-ignored. Only `.env.example` (with a fake value) is committed.
-- The backend keeps no database and stores no requests.
-- Saved cases live only in your own browser's `localStorage`.
-- Please do not paste real passwords, secrets or personal data into the form.
-- The backend limits request size, rate-limits by IP and restricts CORS to your site via `ALLOWED_ORIGINS`.
+- The BharatCode API key is stored only in the Vercel backend environment.
+- It is never included in frontend code or committed to GitHub.
+- `.env` files are ignored by Git.
+- The backend does not store requests in a database.
+- Saved cases are stored only in your browser’s localStorage.
+- Do not paste real passwords, API keys or personal data into the form.
+
+## Run locally
+
+Requirements:
+
+- Node.js 18 or newer
+- A BharatCode account with API access
+
+```bash
+git clone [https://github.com/ArokiaNisha/agent-autopsy.git](https://github.com/ArokiaNisha/agent-autopsy.git)
+cd agent-autopsy
+npm install
+cp .env.example .env
+```
+
+On Windows, use:
+
+```bash
+copy .env.example .env
+```
+
+Open `.env` and add:
+
+```env
+BHARATCODE_API_KEY=your_bharatcode_api_key
+BHARATCODE_MODEL=qwen-3.8-27b
+BHARATCODE_API_URL=[https://bharatcode.ai/api/model/v1/chat/completions](https://bharatcode.ai/api/model/v1/chat/completions)
+ALLOWED_ORIGINS=[https://ArokiaNisha.github.io](https://ArokiaNisha.github.io)
+```
+
+Then run:
+
+```bash
+npx vercel dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+## Try it yourself
+
+Open the live demo:
+
+https://agent-autopsy-gamma.vercel.app
+
+Load one of the built-in examples:
+
+- Whitespace in a tool argument
+- Invalid JSON tool call
+- Wrong tool selected
+
+Then click **Analyze failure**.
+
+## Evaluation
+
+Agent Autopsy includes 12 realistic failed agent runs in `EVAL_CASES.md`.
+
+Each case tests one failure type:
+
+- Tool call errors
+- JSON format errors
+- Prompt issues
+- Missing context
+- Model output issues
+- Workflow issues
+
+Run each case once and record:
+
+- Expected failure type
+- Actual failure type
+- Whether the root cause was correct
+- Whether the suggested fix would work
+
+Failure-type accuracy is calculated as:
+
+```text
+correct failure types / 12
+```
+
+## Screenshots
+
+Add screenshots here after uploading them to `docs/screenshots/`.
+
+```md
+
+
+
+
+
+
+```
+
+## Limitations
+
+- The AI can be wrong. Always review the diagnosis before applying a fix.
+- Agent Autopsy only sees the information you paste.
+- It cannot automatically re-run your agent or verify that a fix works.
+- Results depend on BharatCode API availability and access.
+- The confidence value is model-reported, not a measured probability.
+- There is no automatic redaction of secrets in pasted text yet.
+
+## Roadmap
+
+- Redact secrets before sending text to the API
+- Add automated tests and CI for the backend
+- Publish evaluation accuracy results
+- Import runs from common agent log formats
+- Add team workspaces and shared case history
 
 ## Project structure
 
-```
+```text
 agent-autopsy/
-├── BharatCode.txt          # Build League project summary (must be in the root)
+├── BharatCode.txt
 ├── README.md
+├── EVAL_CASES.md
 ├── LICENSE
 ├── .gitignore
 ├── .env.example
 ├── package.json
 ├── vercel.json
-├── index.html              # Frontend
+├── index.html
 ├── styles.css
 ├── app.js
 ├── api/
-│   └── debug.js            # Serverless backend (POST /api/debug)
+│   └── debug.js
 ├── examples/
 │   ├── whitespace-tool-call.md
 │   ├── invalid-json-tool-call.md
@@ -137,13 +252,8 @@ agent-autopsy/
     └── screenshots/
 ```
 
-
-
-
 ## License
 
-[MIT](LICENSE) © 2026 [arokia nisha]
+MIT © 2026 Arokia Nisha. See [LICENSE](LICENSE).
 
----
-
-**Built for the BharatCode Build League.** · **Powered by BharatCode.**
+Built for the BharatCode Build League. Powered by BharatCode.
